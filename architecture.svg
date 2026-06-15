@@ -1,0 +1,268 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="940" viewBox="0 0 1200 940" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a0" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#64748B"/>
+    </marker>
+    <marker id="a1" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#3B82F6"/>
+    </marker>
+    <marker id="a2" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#7C3AED"/>
+    </marker>
+    <marker id="a3" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,9 3,0 6" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="940" fill="#0D1117"/>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" fill="#F1F5F9" font-size="18" font-weight="bold">Weather Forecast AI Agent — End-to-End Architecture</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       USER BROWSER
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="310" y="46" width="280" height="68" rx="10" fill="#1E3A5F" stroke="#3B82F6" stroke-width="2"/>
+  <text x="450" y="67" text-anchor="middle" fill="#93C5FD" font-size="12" font-weight="bold">🌐  User Browser</text>
+  <text x="450" y="83" text-anchor="middle" fill="#BFDBFE" font-size="9">React 18 + TypeScript + Vite + Tailwind CSS</text>
+  <text x="450" y="98" text-anchor="middle" fill="#BFDBFE" font-size="9">SSE streaming · react-markdown v10 + remark-gfm · sessionId → localStorage</text>
+
+  <!-- arrow: browser → ALB -->
+  <line x1="450" y1="114" x2="450" y2="158" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+  <text x="462" y="139" fill="#94A3B8" font-size="9">HTTPS + SSE</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       AWS CLOUD BOUNDARY
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="55" y="165" width="795" height="720" rx="12" fill="#090E1A" stroke="#FF9900" stroke-width="2" stroke-dasharray="10,5"/>
+  <text x="76" y="185" fill="#FF9900" font-size="11" font-weight="bold">☁  AWS Cloud  (us-east-1)</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ALB MAIN
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="305" y="193" width="290" height="60" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="2"/>
+  <text x="450" y="214" text-anchor="middle" fill="#FCD34D" font-size="12" font-weight="bold">⚖️  Application Load Balancer  (main)</text>
+  <text x="450" y="230" text-anchor="middle" fill="#FDE68A" font-size="9">/api/* → Backend Service   ·   /* → Frontend Service</text>
+  <text x="450" y="245" text-anchor="middle" fill="#92400E" font-size="8">weather-main-alb</text>
+
+  <!-- arrow: ALB → Frontend -->
+  <line x1="378" y1="253" x2="213" y2="292" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+  <!-- arrow: ALB → Backend -->
+  <line x1="522" y1="253" x2="687" y2="292" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+
+  <!-- ECS Cluster dashed boundary -->
+  <rect x="68" y="272" width="766" height="122" rx="8" fill="#0A1929" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="84" y="289" fill="#475569" font-size="9" font-weight="bold">ECS Fargate Cluster  (weather-agent-cluster)  ·  Graviton arm64</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       FRONTEND SERVICE
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="78" y="295" width="250" height="90" rx="8" fill="#0C4A6E" stroke="#0EA5E9" stroke-width="2"/>
+  <text x="203" y="314" text-anchor="middle" fill="#BAE6FD" font-size="11" font-weight="bold">⚛️  Frontend Service</text>
+  <text x="203" y="330" text-anchor="middle" fill="#7DD3FC" font-size="9">ECS Fargate (arm64)</text>
+  <text x="203" y="344" text-anchor="middle" fill="#7DD3FC" font-size="9">React + Vite build → Nginx</text>
+  <text x="203" y="358" text-anchor="middle" fill="#7DD3FC" font-size="9">SPA serve  ·  /api/* proxy_pass</text>
+  <text x="203" y="374" text-anchor="middle" fill="#38BDF8" font-size="8">ECR: weather-frontend  ·  port 80</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       BACKEND SERVICE
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="572" y="295" width="254" height="90" rx="8" fill="#052E16" stroke="#16A34A" stroke-width="2"/>
+  <text x="699" y="314" text-anchor="middle" fill="#BBF7D0" font-size="11" font-weight="bold">🐍  Backend Service</text>
+  <text x="699" y="330" text-anchor="middle" fill="#86EFAC" font-size="9">ECS Fargate (arm64)</text>
+  <text x="699" y="344" text-anchor="middle" fill="#86EFAC" font-size="9">FastAPI + uvicorn + sse-starlette</text>
+  <text x="699" y="358" text-anchor="middle" fill="#86EFAC" font-size="9">POST /api/chat/stream (SSE)</text>
+  <text x="699" y="374" text-anchor="middle" fill="#4ADE80" font-size="8">ECR: weather-backend  ·  auto-retry on 500</text>
+
+  <!-- /api proxy label -->
+  <line x1="328" y1="340" x2="570" y2="340" stroke="#3B82F6" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#a1)"/>
+  <text x="449" y="333" text-anchor="middle" fill="#60A5FA" font-size="8">/api/* nginx proxy_pass</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ARROW: Backend → AgentCore
+  ══════════════════════════════════════════════════════════════ -->
+  <line x1="699" y1="385" x2="699" y2="432" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+  <text x="710" y="411" fill="#94A3B8" font-size="8">boto3 invoke_agent_runtime()</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       BEDROCK AGENTCORE RUNTIME BOUNDARY
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="68" y="435" width="766" height="205" rx="10" fill="#1A0A3C" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="88" y="455" fill="#A78BFA" font-size="11" font-weight="bold">🟣  AWS Bedrock AgentCore Runtime  (Managed Serverless)</text>
+  <text x="88" y="470" fill="#6D28D9" font-size="8">ARN: arn:aws:bedrock-agentcore:REGION:ACCOUNT_ID:runtime/weather_forecast_agent-RUNTIME_ID</text>
+
+  <!-- Agent Container inner box -->
+  <rect x="80" y="477" width="744" height="153" rx="8" fill="#2D1B69" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="452" y="496" text-anchor="middle" fill="#C4B5FD" font-size="10" font-weight="bold">Agent Container  (warm per runtimeSessionId  ·  Python 3.11  ·  arm64)</text>
+
+  <!-- BedrockAgentCoreApp block -->
+  <rect x="92" y="503" width="196" height="118" rx="6" fill="#1E1150" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="190" y="521" text-anchor="middle" fill="#DDD6FE" font-size="9" font-weight="bold">BedrockAgentCoreApp</text>
+  <text x="190" y="537" text-anchor="middle" fill="#C4B5FD" font-size="8">bedrock-agentcore 1.14.1</text>
+  <text x="190" y="551" text-anchor="middle" fill="#C4B5FD" font-size="8">@entrypoint  invoke()</text>
+  <text x="190" y="565" text-anchor="middle" fill="#C4B5FD" font-size="8">try/except → [AGENT_ERROR]</text>
+  <text x="190" y="579" text-anchor="middle" fill="#C4B5FD" font-size="8">structured logging → stdout</text>
+  <text x="190" y="596" text-anchor="middle" fill="#8B5CF6" font-size="8">port 8080</text>
+
+  <!-- Strands Agent block -->
+  <rect x="303" y="503" width="224" height="118" rx="6" fill="#1E1150" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="415" y="521" text-anchor="middle" fill="#DDD6FE" font-size="9" font-weight="bold">Strands Agent</text>
+  <text x="415" y="537" text-anchor="middle" fill="#C4B5FD" font-size="8">strands-agents framework</text>
+  <text x="415" y="551" text-anchor="middle" fill="#C4B5FD" font-size="8">System prompt (markdown format)</text>
+  <text x="415" y="565" text-anchor="middle" fill="#C4B5FD" font-size="8">MCPClient(streamablehttp_client)</text>
+  <text x="415" y="579" text-anchor="middle" fill="#C4B5FD" font-size="8">MCP_SERVER_URL  env var</text>
+  <text x="415" y="596" text-anchor="middle" fill="#7C3AED" font-size="8">reads env at module import time</text>
+
+  <!-- Nova Lite block -->
+  <rect x="543" y="503" width="270" height="118" rx="6" fill="#3B0764" stroke="#A21CAF" stroke-width="1.5"/>
+  <text x="678" y="521" text-anchor="middle" fill="#F0ABFC" font-size="9" font-weight="bold">🤖  Amazon Nova Lite</text>
+  <text x="678" y="537" text-anchor="middle" fill="#E879F9" font-size="8">us.amazon.nova-lite-v1:0</text>
+  <text x="678" y="551" text-anchor="middle" fill="#D946EF" font-size="8">Cross-region inference profile</text>
+  <text x="678" y="565" text-anchor="middle" fill="#E879F9" font-size="8">BedrockModel (Strands)</text>
+  <text x="678" y="579" text-anchor="middle" fill="#E879F9" font-size="8">bedrock:InvokeModel  IAM perm</text>
+  <text x="678" y="596" text-anchor="middle" fill="#A21CAF" font-size="8">inference-profile/* resource</text>
+
+  <!-- arrows between inner blocks -->
+  <line x1="288" y1="562" x2="301" y2="562" stroke="#6D28D9" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="527" y1="562" x2="541" y2="562" stroke="#6D28D9" stroke-width="1.5" marker-end="url(#a2)"/>
+
+  <!-- arrow: AgentCore → ALB MCP -->
+  <line x1="452" y1="640" x2="452" y2="668" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+  <text x="464" y="657" fill="#94A3B8" font-size="8">MCP streamable-HTTP</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ALB MCP (internal)
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="297" y="670" width="310" height="52" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="2"/>
+  <text x="452" y="691" text-anchor="middle" fill="#FCD34D" font-size="11" font-weight="bold">⚖️  Internal ALB  (MCP)</text>
+  <text x="452" y="708" text-anchor="middle" fill="#FDE68A" font-size="9">weather-mcp-alb  ·  /mcp  ·  port 80</text>
+
+  <!-- arrow: ALB MCP → MCP Server -->
+  <line x1="452" y1="722" x2="452" y2="754" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       MCP SERVER
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="68" y="756" width="766" height="110" rx="8" fill="#042F2E" stroke="#14B8A6" stroke-width="2"/>
+  <text x="452" y="775" text-anchor="middle" fill="#5EEAD4" font-size="11" font-weight="bold">🔧  MCP Server  (ECS Fargate  ·  FastMCP  ·  stateless_http=True  ·  port 8000)</text>
+  <text x="452" y="791" text-anchor="middle" fill="#2DD4BF" font-size="9">ECR: weather-mcp-server  ·  httpx.AsyncClient  ·  TTLCache(ttl=600s weather, 86400s geocode)</text>
+
+  <!-- 4 tool boxes -->
+  <rect x="82" y="800" width="168" height="26" rx="5" fill="#0D4038" stroke="#0D9488" stroke-width="1"/>
+  <text x="166" y="817" text-anchor="middle" fill="#99F6E4" font-size="9">🌡️  get_current_weather()</text>
+
+  <rect x="260" y="800" width="162" height="26" rx="5" fill="#0D4038" stroke="#0D9488" stroke-width="1"/>
+  <text x="341" y="817" text-anchor="middle" fill="#99F6E4" font-size="9">📅  get_forecast()</text>
+
+  <rect x="432" y="800" width="190" height="26" rx="5" fill="#0D4038" stroke="#0D9488" stroke-width="1"/>
+  <text x="527" y="817" text-anchor="middle" fill="#99F6E4" font-size="9">⚠️  get_severe_alerts()</text>
+
+  <rect x="632" y="800" width="192" height="26" rx="5" fill="#0D4038" stroke="#0D9488" stroke-width="1"/>
+  <text x="728" y="817" text-anchor="middle" fill="#99F6E4" font-size="9">📊  get_historical_weather()</text>
+
+  <text x="452" y="851" text-anchor="middle" fill="#0F766E" font-size="8">One Call API 3.0 — current + 48h hourly + 8-day daily + alerts in a single HTTP call</text>
+
+  <!-- arrow: exits AWS → OWM -->
+  <line x1="452" y1="866" x2="452" y2="900" stroke="#64748B" stroke-width="1.5" marker-end="url(#a0)"/>
+  <text x="464" y="885" fill="#94A3B8" font-size="8">HTTPS</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       OPENWEATHERMAP (external)
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="297" y="903" width="310" height="30" rx="8" fill="#431407" stroke="#EA580C" stroke-width="2"/>
+  <text x="452" y="923" text-anchor="middle" fill="#FDBA74" font-size="10" font-weight="bold">🌦️  OpenWeatherMap  One Call API 3.0</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       CI / CD SIDEBAR
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="876" y="40" width="308" height="890" rx="12" fill="#0D1117" stroke="#374151" stroke-width="2"/>
+  <text x="1030" y="62" text-anchor="middle" fill="#9CA3AF" font-size="12" font-weight="bold">🚀  CI / CD Pipeline</text>
+  <line x1="894" y1="69" x2="1166" y2="69" stroke="#374151" stroke-width="1"/>
+
+  <!-- GitHub -->
+  <rect x="892" y="78" width="276" height="46" rx="7" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+  <text x="1030" y="97" text-anchor="middle" fill="#E6EDF3" font-size="11" font-weight="bold">GitHub  (main branch)</text>
+  <text x="1030" y="114" text-anchor="middle" fill="#7D8590" font-size="9">git push main  →  triggers workflow</text>
+
+  <line x1="1030" y1="124" x2="1030" y2="146" stroke="#4B5563" stroke-width="1.5" marker-end="url(#a3)"/>
+
+  <!-- GitHub Actions -->
+  <rect x="892" y="148" width="276" height="132" rx="7" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+  <text x="1030" y="168" text-anchor="middle" fill="#E6EDF3" font-size="11" font-weight="bold">GitHub Actions</text>
+  <text x="905" y="187" fill="#7D8590" font-size="9" font-weight="bold">ci.yml  (on PR):</text>
+  <text x="905" y="202" fill="#6E7681" font-size="8">  pytest · mypy · eslint · tsc --noEmit</text>
+  <text x="905" y="220" fill="#7D8590" font-size="9" font-weight="bold">deploy.yml  (on main push):</text>
+  <text x="905" y="235" fill="#6E7681" font-size="8">  docker buildx --platform linux/arm64</text>
+  <text x="905" y="249" fill="#6E7681" font-size="8">  ECR push  ·  4 stages sequential</text>
+  <text x="905" y="263" fill="#6E7681" font-size="8">  wait-for-service-stability: true</text>
+  <text x="905" y="277" fill="#6E7681" font-size="8">  update_agent_runtime() for AgentCore</text>
+
+  <line x1="1030" y1="280" x2="1030" y2="302" stroke="#4B5563" stroke-width="1.5" marker-end="url(#a3)"/>
+
+  <!-- ECR -->
+  <rect x="892" y="304" width="276" height="68" rx="7" fill="#161B22" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="1030" y="324" text-anchor="middle" fill="#FCA5A5" font-size="11" font-weight="bold">AWS ECR</text>
+  <text x="905" y="341" fill="#7D8590" font-size="8">weather-frontend    weather-backend</text>
+  <text x="905" y="356" fill="#7D8590" font-size="8">weather-mcp-server  weather-agent</text>
+  <text x="905" y="368" fill="#6E7681" font-size="8">  :latest tag per service  ·  arm64</text>
+
+  <line x1="1030" y1="372" x2="1030" y2="394" stroke="#4B5563" stroke-width="1.5" marker-end="url(#a3)"/>
+
+  <!-- Deploy stages -->
+  <rect x="892" y="396" width="276" height="112" rx="7" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+  <text x="1030" y="416" text-anchor="middle" fill="#E6EDF3" font-size="10" font-weight="bold">Deploy  (sequential)</text>
+  <text x="905" y="434" fill="#6EE7B7" font-size="8">1.  deploy-mcp  →  ECS update-service</text>
+  <text x="905" y="449" fill="#A78BFA" font-size="8">2.  deploy-agent  →  update_agent_runtime()</text>
+  <text x="905" y="464" fill="#86EFAC" font-size="8">3.  deploy-backend  →  ECS update-service</text>
+  <text x="905" y="479" fill="#7DD3FC" font-size="8">4.  deploy-frontend  →  ECS update-service</text>
+  <text x="905" y="497" fill="#6E7681" font-size="8">  amazon-ecs-deploy-task-definition@v1</text>
+
+  <line x1="1030" y1="508" x2="1030" y2="524" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- GitHub Secrets -->
+  <rect x="892" y="526" width="276" height="100" rx="7" fill="#161B22" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="1030" y="546" text-anchor="middle" fill="#FCD34D" font-size="10" font-weight="bold">GitHub Secrets</text>
+  <text x="905" y="563" fill="#FDE68A" font-size="8">AWS_ACCESS_KEY_ID</text>
+  <text x="905" y="578" fill="#FDE68A" font-size="8">AWS_SECRET_ACCESS_KEY</text>
+  <text x="905" y="593" fill="#FDE68A" font-size="8">AWS_ACCOUNT_ID</text>
+  <text x="905" y="608" fill="#FDE68A" font-size="8">AGENT_RUNTIME_ARN</text>
+  <text x="905" y="620" fill="#FDE68A" font-size="8">OWM_API_KEY</text>
+
+  <!-- IAM -->
+  <rect x="892" y="638" width="276" height="94" rx="7" fill="#161B22" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="1030" y="657" text-anchor="middle" fill="#FCD34D" font-size="10" font-weight="bold">AWS IAM</text>
+  <text x="905" y="674" fill="#FDE68A" font-size="8">Task Execution Role  (ECR pull · CW logs)</text>
+  <text x="905" y="689" fill="#FDE68A" font-size="8">Task Role  (bedrock:InvokeModel ·</text>
+  <text x="905" y="703" fill="#FDE68A" font-size="8">  bedrock-agentcore:InvokeAgentRuntime)</text>
+  <text x="905" y="720" fill="#FDE68A" font-size="8">AgentCore Role  (bedrock:InvokeModel)</text>
+
+  <!-- Secrets Manager -->
+  <rect x="892" y="744" width="276" height="52" rx="7" fill="#161B22" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="1030" y="764" text-anchor="middle" fill="#FCD34D" font-size="10" font-weight="bold">Secrets Manager</text>
+  <text x="905" y="781" fill="#FDE68A" font-size="8">/weather-agent/owm-api-key</text>
+  <text x="905" y="793" fill="#6E7681" font-size="8">injected into MCP task definition</text>
+
+  <!-- CloudWatch -->
+  <rect x="892" y="808" width="276" height="52" rx="7" fill="#161B22" stroke="#374151" stroke-width="1.5"/>
+  <text x="1030" y="828" text-anchor="middle" fill="#9CA3AF" font-size="10" font-weight="bold">CloudWatch Logs</text>
+  <text x="905" y="845" fill="#6E7681" font-size="8">/ecs/weather-backend  ·  /ecs/weather-mcp</text>
+  <text x="905" y="857" fill="#6E7681" font-size="8">/ecs/weather-frontend</text>
+
+  <!-- Legend -->
+  <rect x="892" y="872" width="276" height="50" rx="7" fill="#111827" stroke="#1F2937" stroke-width="1"/>
+  <text x="1030" y="887" text-anchor="middle" fill="#6E7681" font-size="8" font-weight="bold">LEGEND</text>
+  <rect x="898" y="893" width="9" height="9" rx="2" fill="#1E3A5F" stroke="#3B82F6" stroke-width="1"/>
+  <text x="912" y="902" fill="#7DD3FC" font-size="8">Browser</text>
+  <rect x="962" y="893" width="9" height="9" rx="2" fill="#052E16" stroke="#16A34A" stroke-width="1"/>
+  <text x="976" y="902" fill="#86EFAC" font-size="8">ECS Fargate</text>
+  <rect x="1052" y="893" width="9" height="9" rx="2" fill="#2D1B69" stroke="#7C3AED" stroke-width="1"/>
+  <text x="1066" y="902" fill="#C4B5FD" font-size="8">AgentCore</text>
+  <rect x="898" y="908" width="9" height="9" rx="2" fill="#042F2E" stroke="#14B8A6" stroke-width="1"/>
+  <text x="912" y="917" fill="#5EEAD4" font-size="8">MCP/Tools</text>
+  <rect x="962" y="908" width="9" height="9" rx="2" fill="#451A03" stroke="#F59E0B" stroke-width="1"/>
+  <text x="976" y="917" fill="#FCD34D" font-size="8">AWS LB/IAM</text>
+  <rect x="1052" y="908" width="9" height="9" rx="2" fill="#431407" stroke="#EA580C" stroke-width="1"/>
+  <text x="1066" y="917" fill="#FDBA74" font-size="8">External API</text>
+
+</svg>

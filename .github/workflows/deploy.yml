@@ -1,0 +1,187 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  ECS_CLUSTER: weather-agent-cluster
+
+jobs:
+  # ── MCP Server ─────────────────────────────────────────────────────────────
+  deploy-mcp:
+    name: Deploy MCP Server
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        id: build
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/weather-mcp-server:${{ github.sha }}"
+          docker buildx build \
+            --platform linux/arm64 \
+            -t "$IMAGE" \
+            -t "${{ env.ECR_REGISTRY }}/weather-mcp-server:latest" \
+            --push \
+            ./mcp-server
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - uses: aws-actions/amazon-ecs-render-task-definition@v1
+        id: task-def
+        with:
+          task-definition: infrastructure/task-def-mcp.json
+          container-name: mcp-server
+          image: ${{ steps.build.outputs.image }}
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: weather-mcp-service
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+  # ── Agent (AgentCore Runtime) ───────────────────────────────────────────────
+  deploy-agent:
+    name: Deploy Agent (AgentCore)
+    runs-on: ubuntu-latest
+    needs: [deploy-mcp]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push agent image
+        id: build
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/weather-agent:${{ github.sha }}"
+          docker buildx build \
+            --platform linux/arm64 \
+            -t "$IMAGE" \
+            -t "${{ env.ECR_REGISTRY }}/weather-agent:latest" \
+            --push \
+            ./agent
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install boto3
+
+      - name: Update AgentCore Runtime
+        env:
+          AGENT_RUNTIME_ARN: ${{ secrets.AGENT_RUNTIME_ARN }}
+        run: |
+          python infrastructure/create_agentcore_runtime.py \
+            --image "${{ steps.build.outputs.image }}" \
+            --agent-runtime-arn "$AGENT_RUNTIME_ARN"
+
+  # ── Backend ─────────────────────────────────────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: [deploy-agent]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        id: build
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/weather-backend:${{ github.sha }}"
+          docker buildx build \
+            --platform linux/arm64 \
+            -t "$IMAGE" \
+            -t "${{ env.ECR_REGISTRY }}/weather-backend:latest" \
+            --push \
+            ./backend
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - uses: aws-actions/amazon-ecs-render-task-definition@v1
+        id: task-def
+        with:
+          task-definition: infrastructure/task-def-backend.json
+          container-name: backend
+          image: ${{ steps.build.outputs.image }}
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: weather-backend-service
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+  # ── Frontend ────────────────────────────────────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: [deploy-backend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build and push
+        id: build
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/weather-frontend:${{ github.sha }}"
+          # Frontend: standard amd64 nginx image is fine
+          docker build \
+            -t "$IMAGE" \
+            -t "${{ env.ECR_REGISTRY }}/weather-frontend:latest" \
+            ./frontend
+          docker push "$IMAGE"
+          docker push "${{ env.ECR_REGISTRY }}/weather-frontend:latest"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - uses: aws-actions/amazon-ecs-render-task-definition@v1
+        id: task-def
+        with:
+          task-definition: infrastructure/task-def-frontend.json
+          container-name: frontend
+          image: ${{ steps.build.outputs.image }}
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: weather-frontend-service
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
